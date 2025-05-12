@@ -90,7 +90,8 @@ class _AITutorScreenState extends State<AITutorScreen> {
                   itemCount: itemCount,
                   itemBuilder: (context, index) {
                     if (streamingText != null && index == itemCount - 1) {
-                      // Show the streaming/typing AI message
+                      final words = provider.streamingWords;
+                      final wordIndex = provider.streamingWordIndex;
                       return Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -103,17 +104,9 @@ class _AITutorScreenState extends State<AITutorScreen> {
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * 0.75,
                           ),
-                          child: Linkify(
-                            onOpen: (link) async {
-                              final url = Uri.parse(link.url);
-                              if (await canLaunchUrl(url)) {
-                                await launchUrl(url, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                            text: streamingText.isEmpty ? 'AI is typing...' : streamingText,
-                            style: const TextStyle(color: Colors.black),
-                            linkStyle: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
-                            options: const LinkifyOptions(humanize: false),
+                          child: _StreamingWordBubble(
+                            words: words,
+                            currentWordIndex: wordIndex,
                           ),
                         ),
                       );
@@ -209,6 +202,100 @@ class _AITutorScreenState extends State<AITutorScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StreamingWordBubble extends StatefulWidget {
+  final List<String> words;
+  final int currentWordIndex;
+
+  const _StreamingWordBubble({
+    required this.words,
+    required this.currentWordIndex,
+  });
+
+  @override
+  State<_StreamingWordBubble> createState() => _StreamingWordBubbleState();
+}
+
+class _StreamingWordBubbleState extends State<_StreamingWordBubble>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  bool _showCursor = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+    _controller.forward();
+    _startCursorBlink();
+  }
+
+  void _startCursorBlink() async {
+    while (mounted) {
+      setState(() => _showCursor = !_showCursor);
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _StreamingWordBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.currentWordIndex != oldWidget.currentWordIndex) {
+      _controller.reset();
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final words = widget.words;
+    final idx = widget.currentWordIndex;
+    if (words.isEmpty) {
+      return const Text('AI is typing...');
+    }
+    return Wrap(
+      children: [
+        for (int i = 0; i < idx; i++)
+          Text(words[i], style: const TextStyle(color: Colors.black)),
+        if (idx < words.length)
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: Text(
+              words[idx],
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        AnimatedOpacity(
+          opacity: _showCursor ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 250),
+          child: const Text(
+            ' |',
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
     );
   }
 } 

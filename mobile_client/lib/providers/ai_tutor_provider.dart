@@ -24,11 +24,15 @@ class AITutorProvider with ChangeNotifier {
   bool _isLoading = false;
   bool _showSources = false;
   String? _streamingText;
+  int _streamingWordIndex = 0;
+  List<String> _streamingWords = [];
 
   List<Message> get messages => _messages;
   bool get isLoading => _isLoading;
   bool get showSources => _showSources;
   String? get streamingText => _streamingText;
+  int get streamingWordIndex => _streamingWordIndex;
+  List<String> get streamingWords => _streamingWords;
 
   void setShowSources(bool value) {
     _showSources = value;
@@ -48,6 +52,8 @@ class AITutorProvider with ChangeNotifier {
     try {
       _isLoading = true;
       _streamingText = '';
+      _streamingWords = [];
+      _streamingWordIndex = 0;
       notifyListeners();
 
       final response = await _groqService.getAIResponse(
@@ -55,11 +61,17 @@ class AITutorProvider with ChangeNotifier {
         showSources: _showSources,
       );
 
-      // Simulate streaming by revealing the response character by character
-      for (int i = 1; i <= response.length; i++) {
-        _streamingText = response.substring(0, i);
+      // Split response into words and spaces, preserving formatting
+      final words = RegExp(r'(\S+|\s+)').allMatches(response).map((m) => m.group(0)!).toList();
+      _streamingWords = words;
+      _streamingText = '';
+      notifyListeners();
+
+      for (int i = 0; i < words.length; i++) {
+        _streamingWordIndex = i;
+        _streamingText = words.sublist(0, i + 1).join('');
         notifyListeners();
-        await Future.delayed(const Duration(milliseconds: 5)); // Faster typing speed
+        await Future.delayed(const Duration(milliseconds: 80)); // Adjust speed as desired
       }
 
       _messages.add(Message(
@@ -68,6 +80,8 @@ class AITutorProvider with ChangeNotifier {
         timestamp: DateTime.now(),
       ));
       _streamingText = null;
+      _streamingWords = [];
+      _streamingWordIndex = 0;
     } catch (e) {
       _messages.add(Message(
         text: 'Sorry, I encountered an error: ${e.toString()}',
@@ -75,6 +89,8 @@ class AITutorProvider with ChangeNotifier {
         timestamp: DateTime.now(),
       ));
       _streamingText = null;
+      _streamingWords = [];
+      _streamingWordIndex = 0;
     } finally {
       _isLoading = false;
       notifyListeners();
