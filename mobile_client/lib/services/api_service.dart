@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 import '../models/user.dart';
 import '../models/course.dart';
 import '../models/book.dart';
@@ -11,16 +12,15 @@ import '../models/faq.dart';
 
 class ApiService {
   // Base URL of the backend API
-  // For web, use localhost
-  // For Android emulator, use 10.0.2.2 (points to host machine's localhost)
-  // For iOS simulator, use localhost
   static String get baseUrl {
     if (kIsWeb) {
       return 'http://localhost:4000'; // Web
-    } else {
+    } else if (!kIsWeb && Platform.isAndroid) {
       return 'http://10.0.2.2:4000'; // Android emulator
-      // If you're testing on a physical device, use your computer's IP address
-      // return 'http://192.168.1.X:4000'; // Replace X with your IP
+    } else if (!kIsWeb && Platform.isIOS) {
+      return 'http://localhost:4000'; // iOS simulator
+    } else {
+      return 'http://localhost:4000'; // Default
     }
   }
   

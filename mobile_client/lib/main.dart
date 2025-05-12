@@ -5,6 +5,7 @@ import 'providers/course_provider.dart';
 import 'providers/book_provider.dart';
 import 'providers/career_path_provider.dart';
 import 'providers/faq_provider.dart';
+import 'providers/ai_tutor_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BookProvider()),
         ChangeNotifierProvider(create: (_) => CareerPathProvider()),
         ChangeNotifierProvider(create: (_) => FAQProvider()),
+        ChangeNotifierProvider(create: (_) => AITutorProvider()),
       ],
       child: MaterialApp(
         title: 'National Open Courseware',

@@ -32,22 +32,23 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      if (username.isEmpty || password.isEmpty) {
+        throw Exception('Username and password are required');
+      }
+
       _currentUser = await _apiService.login(username, password);
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      // Extract the error message for better user feedback
-      if (e.toString().contains('message')) {
-        try {
-          // Try to extract the message from the error
-          final errorMsg = e.toString().split('message":"')[1].split('"}')[0];
-          _error = errorMsg;
-        } catch (_) {
-          _error = e.toString();
-        }
+      if (e.toString().contains('Connection failed')) {
+        _error = 'Connection failed. Please check if the server is running.';
+      } else if (e.toString().contains('Invalid username or password')) {
+        _error = 'Invalid username or password';
+      } else if (e.toString().contains('Username and password are required')) {
+        _error = 'Username and password are required';
       } else {
-        _error = e.toString();
+        _error = 'An error occurred during login. Please try again.';
       }
       notifyListeners();
       throw _error!;
@@ -60,14 +61,28 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      if (username.isEmpty || password.isEmpty) {
+        throw Exception('Username and password are required');
+      }
+
+      if (password.length < 6) {
+        throw Exception('Password must be at least 6 characters long');
+      }
+
       await _apiService.register(username, password);
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _error = e.toString();
+      if (e.toString().contains('Connection failed')) {
+        _error = 'Connection failed. Please check if the server is running.';
+      } else if (e.toString().contains('Could not register')) {
+        _error = 'Registration failed. Username might already be taken.';
+      } else {
+        _error = e.toString();
+      }
       notifyListeners();
-      throw e; // Re-throw to handle in the UI
+      throw _error!;
     }
   }
 
