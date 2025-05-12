@@ -1,0 +1,65 @@
+/* Add Career Path Component Styles */
+.add-career-path-container {
+    max-width: 730px;
+    margin: 20px auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.add-career-path-container h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.add-career-path-container button {
+    padding: 10px 20px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.add-career-path-container button:hover {
+    background-color: #333;
+}
+
+.add-career-path-container form {
+    margin-top: 20px;
+}
+
+.add-career-path-container input,
+.add-career-path-container textarea,
+.add-career-path-container ReactQuill {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-career-path-container textarea,
+.add-career-path-container ReactQuill {
+    resize: vertical;
+}
+
+.add-career-path-container button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-career-path-container button:hover {
+    background-color: #333;
+}
+

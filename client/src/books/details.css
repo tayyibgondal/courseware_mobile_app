@@ -1,0 +1,97 @@
+/* Book Page Component Styles */
+.book-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.book-page h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.book-page button {
+    padding: 10px 20px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book-page button:hover {
+    background-color: #333;
+}
+
+.book-page p {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.edit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.Edit,
+.Delete {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.Edit {
+    background-color: #030303;
+}
+
+.Delete {
+    background-color: #dc3545;
+}
+
+.Edit:hover,
+.Delete:hover {
+    opacity: 0.9;
+}
+
+.summary {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.author {
+    font-style: italic;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+time {
+    color: #888;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.download a {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.download a:hover {
+    background-color: #218838;
+}

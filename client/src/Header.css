@@ -1,0 +1,125 @@
+body,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #fff;
+    /* Change background color to white */
+    color: #000;
+    /* Change text color to black */
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Styling for the navigation links */
+.nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav a {
+    color: black;
+    text-decoration: none;
+    padding: 10px;
+    margin: 0 15px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav a:before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: black;
+    transition: width 0.3s ease;
+}
+
+.nav a:hover:before {
+    width: 100%;
+}
+
+/* Styling for the More dropdown */
+.dropdown {
+    position: relative;
+}
+
+.dropdown span {
+    color: black;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: color 0.3s ease;
+}
+
+.dropdown:hover span {
+    color: #ff6b6b;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #ffffff;
+    color: #000;
+}
+
+/* Vertical layout for dropdown items */
+.dropdown-content.vertical {
+    flex-direction: column;
+}
+
+/* Styling for the logout link */
+.dropdown-content a:last-child {
+    border-top: 1px solid #555;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav {
+        margin-top: 15px;
+    }
+
+    .nav a {
+        margin: 0;
+    }
+
+    .dropdown {
+        margin-top: 15px;
+    }
+}

@@ -1,0 +1,94 @@
+/* Course Details Styles */
+.course-details {
+    max-width: 730px;
+    margin: 20px auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.course-details h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.course-details p {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.course-info {
+    margin-top: 20px;
+}
+
+.course-info h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.summary {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.download a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.download a:hover {
+    background-color: #333;
+}
+
+.author {
+    font-style: italic;
+    color: #777;
+}
+
+time {
+    display: block;
+    color: #888;
+}
+
+/* Edit Row Styles */
+.edit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.edit-row .Edit,
+.edit-row .Delete {
+    flex: 1;
+    display: inline-block;
+    padding: 10px;
+    text-align: center;
+    background-color: #000000;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+    /* Adjusted margin for spacing */
+}
+
+.edit-row .Delete {
+    padding: 9px;
+}
+
+.edit-row .Edit:hover,
+.edit-row .Delete:hover {
+    background-color: #000;
+}

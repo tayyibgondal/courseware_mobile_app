@@ -1,0 +1,213 @@
+/* Create book */ 
+.add-book-container {
+  max-width: 730px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.add-book-container h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.add-book-container button {
+  padding: 10px 20px;
+  margin: 10px 0;
+  background-color: #000;
+  /* Black button color */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-book-container button:hover {
+  background-color: #333;
+  /* Darker shade on hover */
+}
+
+.add-book-container form {
+  margin-top: 20px;
+}
+
+.add-book-container input,
+.add-book-container textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-book-container input[type="file"] {
+  margin-bottom: 20px;
+}
+
+/* Edit book */
+.edit-details-container {
+  max-width: 730px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.edit-details-container h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.edit-details-container button {
+  padding: 10px 20px;
+  margin: 10px 0;
+  background-color: #000;
+  /* Black button color */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-details-container button:hover {
+  background-color: #333;
+  /* Darker shade on hover */
+}
+
+.edit-details-container form {
+  margin-top: 20px;
+}
+
+.edit-details-container input,
+.edit-details-container textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-details-container input[type="file"] {
+  margin-bottom: 20px;
+}
+
+/* Books page */
+.list-page-book {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.list-page-book h1 {
+  color: #333;
+}
+
+.edit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create {
+  padding: 10px 20px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create:hover {
+  background-color: #333;
+}
+
+.search {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.search input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search input[type="submit"] {
+  padding: 10px 20px;
+  margin-left: 10px;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search input[type="submit"]:hover {
+  background-color: #333;
+}
+
+/* Edit Details Container Styles */
+.edit-details-container {
+  max-width: 730px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.edit-details-container h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.edit-details-container button {
+  padding: 10px 20px;
+  background-color: #000000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-details-container button:hover {
+  background-color: #2d2d2d;
+}
+
+.edit-details-container form {
+  margin-top: 20px;
+}
+
+.edit-details-container input,
+.edit-details-container textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-details-container input[type="file"] {
+  margin-bottom: 20px;
+}
+

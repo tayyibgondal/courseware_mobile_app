@@ -1,0 +1,538 @@
+/* Header and overall page */
+*{
+  box-sizing: border-box;
+}
+
+body {
+  color: #222;
+  background-color: #ffffff;
+}
+
+main {
+  padding: 10px;
+  margin: 0 auto;
+  max-width: 730px;
+  min-height: calc(100vh - 20px); /* Subtracting the sum of padding and margin */
+  box-sizing: border-box;
+}
+
+header {
+  padding: 15px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+header nav {
+  display: flex;
+}
+
+header > a {
+  font-weight: bold;
+  font-size: 1.5rem;
+  display: inline-block;
+  background: linear-gradient(90deg, rgba(147, 97, 97, 0.094) 38%, rgba(191, 182, 182, 0.075) 62%);
+  color: black;
+  border-radius: 38% 62% 73% 27% / 26% 55% 45% 74%;
+  padding: 10px;
+}
+
+/* ========= BLOGS ========== */
+
+div.post img {
+  max-width: 100%;
+  margin:-10px;
+}
+
+div.post {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  margin-bottom: 40px;
+}
+
+div.post .texts {
+  font-size: 0.9rem;
+}
+
+div.post time {
+  display: block;
+}
+
+div.texts > a {
+  font-size: x-large;
+  font-weight: 700;
+}
+/* =================== */
+/* Styles for login and register page */
+form.login, form.register {
+  max-width: 730px;
+  margin: 0 auto;
+  margin-bottom: 100px;
+}
+
+form.login h1, form.register h1 {
+text-align: center;
+margin-bottom: 10px;
+}
+
+input {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 5px;
+  border-color: #ccc;
+  border-radius: 2.5px;
+}
+
+form.login button,
+form.register button {
+  margin-top: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 5px;
+  background-color: #202020;
+  color: white;
+  border-radius: 2.5px;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: black;
+  cursor: pointer;
+}
+
+/* =================== */
+/* Styles for individual post page */
+div.post-page div.image {
+  max-height: 300px;
+  overflow: hidden;
+  display: flex;
+}
+
+div.post-page div.image img {
+  object-fit: cover;
+    object-position: center center;
+}
+
+.author {
+  font-weight: bold;
+}
+
+time {
+  color: #a0a0a0;
+}
+
+/* =================== */
+/* Styles for edit post */ 
+div.post-page .edit-row {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+div.post-page .edit-row a {
+  background-color: #202020;
+  color: white;
+  padding:7.5px;
+  padding-left: 30px;
+  padding-right: 30px;
+  font-size: 1.3rem;
+  margin-left: 10px;
+}
+
+/* ================= */
+div.list-page .edit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -30px;
+}
+
+div.list-page .edit-row a {
+  background-color: #202020;
+  color: white;
+  padding: 1.5px;
+  padding-top: 3px;
+  padding-bottom: 6px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 1rem;
+  margin-left: 10px;
+  border-radius: 3px;
+}
+
+/* =================== */
+/* Styles for book detail post */
+
+.book-page{
+  max-width: 730px;
+  margin: auto 0;
+}
+.book-page h1 {
+  text-align: center;
+}
+
+.book-page > p, .book-page p {
+  text-align: center;
+  font-weight: bold;
+  color: #a0a0a0;
+}
+
+div.book-page .edit-row a {
+  background-color: #202020;
+  color: white;
+  padding: 5.5px;
+  padding-left: 30px;
+  padding-right: 30px;
+  font-size: 1.3rem;
+  margin-left: 10px;
+}
+
+div.book-page .edit-row {
+display: flex;
+justify-content: center;
+margin-bottom: 20px;
+gap: 4px
+}
+
+div.book-page .edit-row .Edit {
+  flex-basis: 0;
+}
+
+div.book-page .edit-row .Delete {
+  flex-basis: 0;
+}
+
+.book-page .summary {
+  margin-bottom: 10px;
+}
+
+.book-page time, .book-page .author, .book-page .download {
+margin-bottom: 10px;
+margin-top: 10px;
+}
+
+.book-page .download {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.book-page .download a {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.book-page .download a:hover {
+  background-color: #218838;
+}
+
+/* ========= Library index page ======== */
+.book .info {
+  text-align: left;
+}
+
+.book .author {
+  text-align: left;
+}
+
+div.list-page-book {
+  max-width: 730px;
+  margin: auto;
+}
+
+/* ========= ADD NEW BOOK BUTTON ======== */
+div.list-page-book .edit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -30px;
+}
+
+div.list-page-book .edit-row a {
+  background-color: #202020;
+  color: white;
+  padding: 1.5px;
+  padding-top: 3px;
+  padding-bottom: 6px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 1rem;
+  margin-left: 10px;
+  border-radius: 3px;
+}
+
+div.book .summary {
+  text-align: left;
+}
+
+/* Course Styles */
+/* Course.css */
+
+.course-card {
+  max-width: 730px;
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.course-title {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.course-info {
+  margin-bottom: 8px;
+}
+
+.info-label {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.details-link {
+  display: block;
+  margin-top: 12px;
+  color: #191919;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* CourseDetails.css */
+
+.course-details {
+  max-width: 730px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.course-details h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.course-details p {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.course-details .course-info {
+  margin-top: 20px;
+}
+
+.course-details .edit-row {
+  margin-top: 20px;
+}
+
+.course-details .edit-row .Edit {
+  display: block;
+  padding: 8px 16px;
+  background-color: #202020;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+.course-details .summary {
+  margin-top: 20px;
+  color: #333;
+}
+
+.course-details .author {
+  margin-top: 10px;
+  color: #555;
+}
+
+.course-details time {
+  display: block;
+  margin-top: 10px;
+  color: #777;
+}
+
+.course-details .download {
+  margin-top: 20px;
+}
+
+.course-details .download a {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.course-details .download a:hover {
+  background-color: #218838;
+}
+
+.search {
+  margin-bottom: 25px;
+}
+
+.search {
+  display: flex;
+  width: 100%;
+}
+
+.search input[type="text"] {
+  padding: 10px;
+  width: 80%;
+}
+.search div {
+  width: 20%;
+  margin-left: 5px;
+}
+
+.search input[type="submit"] {
+  background-color: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+/* Chatbot styles */
+/* ChatStyles.css */
+
+.tutor {
+  font-family: 'Arial, sans-serif';
+  max-width: 730px;
+  margin: auto;
+  padding: 20px;
+
+  border-radius: 8px;
+}
+
+.tutor h1 {
+  color: #333;
+}
+
+.upload-file-form {
+  margin-top: 10px;
+}
+
+.upload-file-form input {
+  margin-bottom: 10px;
+}
+
+.chat-prompt-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.chat-prompt-form input[type="text"] {
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.chat-prompt-form input[type="submit"] {
+  padding: 8px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.response-section {
+  margin-top: 20px;
+}
+
+
+.response {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.translateButton {
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+.translate {
+  max-width: 730px;
+  margin-bottom: 10px;
+}
+
+/* Donate form styles */
+
+.forms {
+  max-width: 730px;
+  margin: 0 auto;
+}
+
+.forms div {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.forms form {
+  display: flex;
+  flex-direction: column;
+}
+
+.forms label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.forms input,
+.forms select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 2.5px;
+}
+
+.forms input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #202020;
+  color: white;
+  border-radius: 2.5px;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.forms input[type="submit"]:hover {
+  background-color: black;
+  cursor: pointer;
+}
+
+/* Vertical dropdown */
+.vertical {
+  display: flex;
+  flex-direction: column;
+}
+

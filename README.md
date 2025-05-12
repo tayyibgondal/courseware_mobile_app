@@ -1,16 +1,55 @@
-# open_courseware_app
+# National Open Courseware
 
-A new Flutter project.
+Here is how the UI looks like:
 
-## Getting Started
+### Landing Page
 
-This project is a starting point for a Flutter application.
+![](images/1_landing_page.png)
 
-A few resources to get you started if this is your first Flutter project:
+### Blogs
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![](images/2_Posts.png)
+![](images/2_Posts_b.png)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Blog details page
+
+![](images/2_PostDetails_c.png)
+
+### Urdu translation feature in blogs
+
+![](images/2_PostDetails_translated_d.png)
+
+### Individual course card
+
+![](images/9_course.png)
+
+### Upload course page
+
+![](images/9_course_create_b.png)
+
+### Library
+
+![](images/3_Library.png)
+
+### AI Tutor
+
+You can upload any pdf, and ask about it from our tutor. We have got you covered!
+
+![](images/0_AiTutor_a.png)
+![](images/0_AiTutor_b.png)
+
+### Urdu translation feature of AI Tutor response
+
+![](images/0_AiTutor_c.png)
+
+### Chatrooms
+
+![](images/7_Chatroom.png)
+
+### Inside individual room
+
+![](images/8_Inside_room.png)
+
+### Faqs
+
+![](images/6_faqs.png)

@@ -1,0 +1,57 @@
+/* =================== */
+/* Footer styles */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 100px
+}
+
+.footer {
+    width: 100%;
+    background-color: #202020;
+    color: #f2f2f2;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 300px;
+}
+
+.heading-footer {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.buttons-footer {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 10px;
+}
+
+.blue-button,
+.blue-button-reverse {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    text-align: center;
+width: 150px;
+}
+
+.blue-button:hover,
+.blue-button-reverse:hover {
+    background-color: rgb(186, 148, 148);
+}
+
+.detail-footer {
+    margin-bottom: 5px;
+}
+
+.cr {
+    margin-top: 10px;
+    font-size: 0.8rem;
+}

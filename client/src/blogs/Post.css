@@ -1,0 +1,166 @@
+.post-page {
+    max-width: 730px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    padding-top: 0px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.edit-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.image {
+    margin-bottom: 15px;
+}
+
+.image img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.Edit {
+    padding: 10px 20px;
+    background-color: #000000;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.Edit:hover {
+    background-color: #000000;
+}
+
+.author {
+    margin-top: 15px;
+    font-style: italic;
+    color: #555;
+}
+
+time {
+    display: block;
+    margin-top: 10px;
+    color: #777;
+}
+
+/* Styling for the "Go Back" button */
+.button-go-back {
+  position: absolute;
+  top: 20px; /* Adjust the top spacing as needed */
+  left: 20px; /* Adjust the left spacing as needed */
+  padding: 10px 15px;
+  background-color: #000000;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-go-back:hover {
+  background-color: #000000;
+}
+
+/* Edit post */
+.edit-post-container {
+    max-width: 730px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.edit-post-container h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.edit-post-container button {
+    padding: 10px 20px;
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.edit-post-container form {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.edit-post-container input,
+.edit-post-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.edit-post-container input[type="file"] {
+    margin-bottom: 5px;
+}
+
+.create-post-container {
+    max-width: 730px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.create-post-container h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.create-post-container button {
+    padding: 10px 20px;
+    margin: 10px 0;
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.create-post-container button:hover {
+    background-color: #000000;
+}
+
+.create-post-container form {
+    margin-top: 20px;
+}
+
+.create-post-container input,
+.create-post-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.create-post-container input[type="file"] {
+    margin-bottom: 20px;
+}
+
+

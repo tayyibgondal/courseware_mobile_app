@@ -1,0 +1,65 @@
+  /* .edit-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .Edit,
+  .Delete {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .Delete {
+    background-color: #0f0f0f;
+  }
+  
+  .Edit {
+    display: block;
+    width: 100%;
+  }
+  
+  .Edit:hover,
+  .Delete:hover {
+    background-color: #333;
+  }
+  
+  .footer {
+    margin-top: 20px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .button-wrapper {
+    margin-top: 10px;
+  }
+  
+  .create-faq-link,
+  .ask-question-link,
+  .unanswered-faqs-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  
+  .create-faq-link:hover,
+  .ask-question-link:hover,
+  .unanswered-faqs-button:hover {
+    background-color: #45a049;
+  } */

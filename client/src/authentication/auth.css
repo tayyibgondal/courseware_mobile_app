@@ -1,0 +1,42 @@
+/* Register Form Styles */
+.register-container {
+    max-width: 730px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.register-container h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.register-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.register-container button {
+    padding: 10px 20px;
+    background-color: #000;
+    /* Black button color */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-container button:hover {
+    background-color: #333;
+    /* Darker shade on hover */
+}
+
+/* Add more styling as needed */

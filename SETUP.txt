@@ -1,0 +1,6 @@
+To run the application:
+	1. Go to "client" directory and run the command "npm start" in the terminal.
+ 	2. Go to "server" directory and run the command "npm run start" in the terminal.
+	3. Go to the "chatroom microservice" directory and run the command "npm run start" in the terminal.
+
+NOTE: If you are cloning from github, make sure to run the command "npm i" before running each of the above three commnands.
