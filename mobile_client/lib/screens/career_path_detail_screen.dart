@@ -13,14 +13,28 @@ class CareerPathDetailScreen extends StatefulWidget {
   State<CareerPathDetailScreen> createState() => _CareerPathDetailScreenState();
 }
 
-class _CareerPathDetailScreenState extends State<CareerPathDetailScreen> {
+class _CareerPathDetailScreenState extends State<CareerPathDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CareerPathProvider>(context, listen: false)
           .fetchCareerPathById(widget.careerPathId);
+      _animationController.forward();
     });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,7 +64,8 @@ class _CareerPathDetailScreenState extends State<CareerPathDetailScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      careerPathProvider.fetchCareerPathById(widget.careerPathId);
+                      careerPathProvider
+                          .fetchCareerPathById(widget.careerPathId);
                     },
                     child: const Text('Retry'),
                   ),
@@ -170,19 +185,33 @@ class _CareerPathDetailScreenState extends State<CareerPathDetailScreen> {
   Widget _buildCourseItem(String courseId) {
     // For now, we'll just show a placeholder
     // In a real app, we would fetch course details from the API
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: const Icon(Icons.school),
-        title: Text('Course $courseId'),
-        subtitle: const Text('Click to view course details'),
-        onTap: () {
-          // In a real app, we would navigate to the course details screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Course $courseId details coming soon')),
-          );
-        },
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 50 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: child,
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: ListTile(
+          leading: const Icon(Icons.school),
+          title: Text('Course $courseId'),
+          subtitle: const Text('Click to view course details'),
+          onTap: () {
+            // In a real app, we would navigate to the course details screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Course $courseId details coming soon')),
+            );
+          },
+        ),
       ),
     );
   }
-} 
+}

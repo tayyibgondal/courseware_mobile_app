@@ -7,6 +7,7 @@ import 'providers/career_path_provider.dart';
 import 'providers/faq_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
@@ -32,8 +33,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const LoginScreen(),
+        home: const OnboardingScreen(),
       ),
     );
   }
-} 
+}

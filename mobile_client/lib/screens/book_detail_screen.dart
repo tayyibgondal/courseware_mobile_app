@@ -6,20 +6,97 @@ import 'package:url_launcher/url_launcher.dart';
 
 class BookDetailScreen extends StatefulWidget {
   final String bookId;
+  final Offset initialPosition;
+  final Size initialSize;
 
-  const BookDetailScreen({super.key, required this.bookId});
+  const BookDetailScreen({
+    super.key,
+    required this.bookId,
+    required this.initialPosition,
+    required this.initialSize,
+  });
 
   @override
   State<BookDetailScreen> createState() => _BookDetailScreenState();
 }
 
-class _BookDetailScreenState extends State<BookDetailScreen> {
+class _BookDetailScreenState extends State<BookDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _positionAnimation;
+  late Animation<double> _opacityAnimation;
+  bool _isDataLoaded = false;
+  bool _isImageLoaded = false;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _positionAnimation = Tween<Offset>(
+      begin: widget.initialPosition,
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+    ));
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BookProvider>(context, listen: false).fetchBookById(widget.bookId);
+      _loadBookData();
     });
+  }
+
+  Future<void> _loadBookData() async {
+    final bookProvider = Provider.of<BookProvider>(context, listen: false);
+    await bookProvider.fetchBookById(widget.bookId);
+
+    if (mounted) {
+      setState(() {
+        _isDataLoaded = true;
+      });
+
+      // If there's no image, we can start the animation immediately
+      if (bookProvider.selectedBook?.coverImageUrl == null) {
+        _startAnimation();
+      }
+    }
+  }
+
+  void _startAnimation() {
+    if (_isDataLoaded &&
+        (_isImageLoaded ||
+            Provider.of<BookProvider>(context, listen: false)
+                    .selectedBook
+                    ?.coverImageUrl ==
+                null)) {
+      _animationController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _downloadBook(String? url) async {
@@ -45,14 +122,10 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        title: const Text('Book Details'),
-      ),
+      backgroundColor: Colors.white,
       body: Consumer<BookProvider>(
         builder: (context, bookProvider, child) {
-          if (bookProvider.isLoading) {
+          if (bookProvider.isLoading || !_isDataLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -69,7 +142,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      bookProvider.fetchBookById(widget.bookId);
+                      _loadBookData();
                     },
                     child: const Text('Retry'),
                   ),
@@ -83,134 +156,199 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             return const Center(child: Text('Book not found'));
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Book cover and title section
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (book.coverImageUrl != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          book.coverImageUrl!,
-                          width: 120,
-                          height: 180,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 120,
-                              height: 180,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.book, size: 60),
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      Container(
-                        width: 120,
-                        height: 180,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.book, size: 60),
-                      ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            book.title,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+          return Stack(
+            children: [
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: _positionAnimation.value,
+                    child: Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  width: widget.initialSize.width,
+                  height: widget.initialSize.height,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Hero(
+                    tag: 'book-cover-${book.id}',
+                    child: book.coverImageUrl != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              book.coverImageUrl!,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  // Image is fully loaded
+                                  if (!_isImageLoaded) {
+                                    _isImageLoaded = true;
+                                    _startAnimation();
+                                  }
+                                  return child;
+                                }
+                                return Container(
+                                  color: Colors.grey[300],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                _isImageLoaded = true;
+                                _startAnimation();
+                                return Container(
+                                  color: Colors.grey[300],
+                                  child: const Icon(Icons.book, size: 60),
+                                );
+                              },
                             ),
+                          )
+                        : Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.book, size: 60),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Author: ${book.author}',
-                            style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+              FadeTransition(
+                opacity: _opacityAnimation,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                          height: 200), // Space for the animated cover
+                      Hero(
+                        tag: 'book-title-${book.id}',
+                        child: Text(
+                          book.title,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            'Publisher: ${book.publisher}',
-                            style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Author: ${book.author}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Publisher: ${book.publisher}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        'Year: ${book.year}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 24),
+
+                      if (book.categories.isNotEmpty) ...[
+                        const Text(
+                          'Categories',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            'Year: ${book.year}',
-                            style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: book.categories.map((category) {
+                            return Chip(
+                              label: Text(category),
+                              backgroundColor: Colors.blue.shade100,
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+
+                      const Text(
+                        'Description',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        book.description,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () => _downloadBook(book.downloadUrl),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text(
+                            'Download Book',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Back button - moved to be the last child in the Stack
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 16,
+                left: 16,
+                child: Material(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      _animationController.reverse().then((_) {
+                        Navigator.of(context).pop();
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Categories
-                if (book.categories.isNotEmpty) ...[
-                  const Text(
-                    'Categories',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: book.categories.map((category) {
-                      return Chip(
-                        label: Text(category),
-                        backgroundColor: Colors.blue.shade100,
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Description
-                const Text(
-                  'Description',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  book.description,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Download button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => _downloadBook(book.downloadUrl),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text(
-                      'Download Book',
-                      style: TextStyle(fontSize: 16),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
     );
   }
-} 
+}

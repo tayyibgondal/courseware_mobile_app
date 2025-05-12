@@ -10,15 +10,22 @@ class FAQsScreen extends StatefulWidget {
   State<FAQsScreen> createState() => _FAQsScreenState();
 }
 
-class _FAQsScreenState extends State<FAQsScreen> {
+class _FAQsScreenState extends State<FAQsScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchFAQs();
+      _animationController.forward();
     });
   }
 
@@ -29,6 +36,7 @@ class _FAQsScreenState extends State<FAQsScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -145,33 +153,49 @@ class _FAQsScreenState extends State<FAQsScreen> {
                     padding: const EdgeInsets.all(16),
                     itemBuilder: (context, index) {
                       final faq = faqs[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: ExpansionTile(
-                          title: Text(
-                            faq.question,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                      final delay = index * 0.1;
+
+                      return TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: Duration(milliseconds: 500 + (index * 100)),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 50 * (1 - value)),
+                            child: Opacity(
+                              opacity: value,
+                              child: child,
                             ),
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          subtitle: Text(
-                            'General FAQ',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                          child: ExpansionTile(
+                            title: Text(
+                              faq.question,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
+                            subtitle: Text(
+                              'General FAQ',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            childrenPadding: const EdgeInsets.all(16),
+                            children: [
+                              Text(
+                                faq.answer,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
                           ),
-                          childrenPadding: const EdgeInsets.all(16),
-                          children: [
-                            Text(
-                              faq.answer,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ],
                         ),
                       );
                     },
@@ -191,7 +215,8 @@ class _FAQsScreenState extends State<FAQsScreen> {
                 MaterialPageRoute(
                   builder: (context) => const AddFAQScreen(),
                 ),
-              ).then((_) => _fetchFAQs()); // Refresh FAQs after returning from add screen
+              ).then((_) =>
+                  _fetchFAQs()); // Refresh FAQs after returning from add screen
             },
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: const Icon(Icons.add, color: Colors.white),
@@ -200,4 +225,4 @@ class _FAQsScreenState extends State<FAQsScreen> {
       ],
     );
   }
-} 
+}

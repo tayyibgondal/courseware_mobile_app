@@ -12,15 +12,22 @@ class CareerPathsScreen extends StatefulWidget {
   State<CareerPathsScreen> createState() => _CareerPathsScreenState();
 }
 
-class _CareerPathsScreenState extends State<CareerPathsScreen> {
+class _CareerPathsScreenState extends State<CareerPathsScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchCareerPaths();
+      _animationController.forward();
     });
   }
 
@@ -31,6 +38,7 @@ class _CareerPathsScreenState extends State<CareerPathsScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -146,82 +154,107 @@ class _CareerPathsScreenState extends State<CareerPathsScreen> {
                     itemCount: careerPaths.length,
                     itemBuilder: (context, index) {
                       final careerPath = careerPaths[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CareerPathDetailScreen(careerPathId: careerPath.id),
-                              ),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (careerPath.imageUrl != null)
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          careerPath.imageUrl!,
+                      final delay = index * 0.1;
+
+                      return TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: Duration(milliseconds: 500 + (index * 100)),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 50 * (1 - value)),
+                            child: Opacity(
+                              opacity: value,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CareerPathDetailScreen(
+                                      careerPathId: careerPath.id),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (careerPath.imageUrl != null)
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.network(
+                                            careerPath.imageUrl!,
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                width: 80,
+                                                height: 80,
+                                                color: Colors.grey[300],
+                                                child: const Icon(
+                                                    Icons.trending_up,
+                                                    size: 40),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      else
+                                        Container(
                                           width: 80,
                                           height: 80,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Container(
-                                              width: 80,
-                                              height: 80,
-                                              color: Colors.grey[300],
-                                              child: const Icon(Icons.trending_up, size: 40),
-                                            );
-                                          },
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.trending_up,
+                                              size: 40),
                                         ),
-                                      )
-                                    else
-                                      Container(
-                                        width: 80,
-                                        height: 80,
-                                        color: Colors.grey[300],
-                                        child: const Icon(Icons.trending_up, size: 40),
-                                      ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            careerPath.title,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              careerPath.title,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            careerPath.description,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[700],
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              careerPath.description,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[700],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -243,7 +276,8 @@ class _CareerPathsScreenState extends State<CareerPathsScreen> {
                 MaterialPageRoute(
                   builder: (context) => const AddCareerPathScreen(),
                 ),
-              ).then((_) => _fetchCareerPaths()); // Refresh career paths after returning from add screen
+              ).then((_) =>
+                  _fetchCareerPaths()); // Refresh career paths after returning from add screen
             },
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: const Icon(Icons.add, color: Colors.white),
@@ -252,4 +286,4 @@ class _CareerPathsScreenState extends State<CareerPathsScreen> {
       ],
     );
   }
-} 
+}
