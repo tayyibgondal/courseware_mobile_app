@@ -28,7 +28,7 @@ const app = express();
 // Middlewares
 // Enable CORS for all origins with proper configuration
 app.use(cors({
-  origin: '*',
+  origin: true, // Allow all origins in development
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,
@@ -79,7 +79,7 @@ app.post("/login", async (req, res) => {
   try {
     // Extract username and password
     const { username, password } = req.body;
-    
+
     // Check if username and password are provided
     if (!username || !password) {
       return res.status(400).json({ message: "Username and password are required" });

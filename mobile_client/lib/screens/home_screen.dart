@@ -7,6 +7,7 @@ import 'books_screen.dart';
 import 'career_paths_screen.dart';
 import 'faqs_screen.dart';
 import 'contact_screen.dart';
+import 'ai_tutor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CareerPathsScreen(),
     const FAQsScreen(),
     const ContactScreen(),
+    const AITutorScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -76,6 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.contact_mail),
             label: 'Contact',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'AI Tutor',
           ),
         ],
       ),
