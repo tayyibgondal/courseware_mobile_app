@@ -59,7 +59,7 @@ class AITutorProvider with ChangeNotifier {
       for (int i = 1; i <= response.length; i++) {
         _streamingText = response.substring(0, i);
         notifyListeners();
-        await Future.delayed(const Duration(milliseconds: 15)); // Adjust speed as desired
+        await Future.delayed(const Duration(milliseconds: 5)); // Faster typing speed
       }
 
       _messages.add(Message(
