@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, File;
+import 'package:path/path.dart' as path;
 import '../models/user.dart';
 import '../models/course.dart';
 import '../models/book.dart';
 import '../models/career_path.dart';
 import '../models/faq.dart';
+import '../models/post.dart';
 
 class ApiService {
   // Base URL of the backend API
@@ -46,8 +48,19 @@ class ApiService {
     try {
       final errorJson = jsonDecode(response.body);
       errorMessage = errorJson['message'] ?? 'Unknown error';
+      
+      // For 404 errors, make the message more specific
+      if (response.statusCode == 404) {
+        if (errorMessage == 'Unknown error') {
+          errorMessage = 'Resource not found';
+        }
+      }
     } catch (e) {
-      errorMessage = 'Error ${response.statusCode}: ${response.reasonPhrase}';
+      if (response.statusCode == 404) {
+        errorMessage = 'Resource not found';
+      } else {
+        errorMessage = 'Error ${response.statusCode}: ${response.reasonPhrase}';
+      }
     }
     
     throw Exception(errorMessage);
@@ -175,6 +188,24 @@ class ApiService {
     }
   }
 
+  Future<void> updateCourse(String courseId, Map<String, dynamic> courseData) async {
+    try {
+      await _put('/courses/edit/$courseId', courseData);
+    } catch (e) {
+      debugPrint('Error updating course: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteCourse(String courseId) async {
+    try {
+      await _delete('/courses/delete/$courseId');
+    } catch (e) {
+      debugPrint('Error deleting course: $e');
+      rethrow;
+    }
+  }
+
   // Book methods
   Future<List<Book>> getBooks() async {
     try {
@@ -201,6 +232,24 @@ class ApiService {
       await _post('/library/create', bookData);
     } catch (e) {
       debugPrint('Error creating book: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateBook(String bookId, Map<String, dynamic> bookData) async {
+    try {
+      await _put('/library/edit/$bookId', bookData);
+    } catch (e) {
+      debugPrint('Error updating book: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteBook(String bookId) async {
+    try {
+      await _delete('/library/delete/$bookId');
+    } catch (e) {
+      debugPrint('Error deleting book: $e');
       rethrow;
     }
   }
@@ -235,6 +284,24 @@ class ApiService {
     }
   }
 
+  Future<void> updateCareerPath(String careerPathId, Map<String, dynamic> careerPathData) async {
+    try {
+      await _put('/careerpaths/edit/$careerPathId', careerPathData);
+    } catch (e) {
+      debugPrint('Error updating career path: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteCareerPath(String careerPathId) async {
+    try {
+      await _delete('/careerpaths/delete/$careerPathId');
+    } catch (e) {
+      debugPrint('Error deleting career path: $e');
+      rethrow;
+    }
+  }
+
   // FAQ methods
   Future<List<FAQ>> getFAQs() async {
     try {
@@ -255,6 +322,24 @@ class ApiService {
     }
   }
 
+  Future<void> updateFAQ(String faqId, Map<String, dynamic> faqData) async {
+    try {
+      await _put('/faqs/edit/$faqId', faqData);
+    } catch (e) {
+      debugPrint('Error updating FAQ: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteFAQ(String faqId) async {
+    try {
+      await _delete('/faqs/delete/$faqId');
+    } catch (e) {
+      debugPrint('Error deleting FAQ: $e');
+      rethrow;
+    }
+  }
+
   // Contact method
   Future<void> submitContactForm(Map<String, dynamic> formData) async {
     try {
@@ -268,5 +353,241 @@ class ApiService {
   // Helper function for substring to avoid RangeError
   int min(int a, int b) {
     return a < b ? a : b;
+  }
+
+  // Helper method to make PUT requests
+  Future<dynamic> _put(String endpoint, Map<String, dynamic> data) async {
+    try {
+      final url = Uri.parse('$baseUrl$endpoint');
+      debugPrint('PUT request to: $url');
+      debugPrint('PUT data: $data');
+      
+      final response = await http.put(
+        url,
+        headers: await _getHeaders(),
+        body: jsonEncode(data),
+      ).timeout(const Duration(seconds: 15));
+      
+      debugPrint('Response status: ${response.statusCode}');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body);
+        }
+        return {'success': true};
+      } else {
+        _handleHttpError(response);
+      }
+    } catch (e) {
+      debugPrint('Error in PUT request: $e');
+      if (e is http.ClientException) {
+        throw Exception('Connection failed. Please check if the server is running.');
+      }
+      rethrow;
+    }
+  }
+  
+  // Helper method to make DELETE requests
+  Future<dynamic> _delete(String endpoint) async {
+    try {
+      final url = Uri.parse('$baseUrl$endpoint');
+      debugPrint('DELETE request to: $url');
+      
+      final response = await http.delete(
+        url,
+        headers: await _getHeaders(),
+      ).timeout(const Duration(seconds: 15));
+      
+      debugPrint('Response status: ${response.statusCode}');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body);
+        }
+        return {'success': true};
+      } else {
+        _handleHttpError(response);
+      }
+    } catch (e) {
+      debugPrint('Error in DELETE request: $e');
+      if (e is http.ClientException) {
+        throw Exception('Connection failed. Please check if the server is running.');
+      }
+      rethrow;
+    }
+  }
+
+  // Helper method to upload files with multipart request
+  Future<dynamic> _uploadFile(String endpoint, Map<String, dynamic> data, File? imageFile) async {
+    try {
+      final url = Uri.parse('$baseUrl$endpoint');
+      debugPrint('POST with file upload to: $url');
+      
+      final request = http.MultipartRequest('POST', url);
+      
+      // Add headers
+      final headers = await _getHeaders();
+      headers.forEach((key, value) {
+        request.headers[key] = value;
+      });
+      
+      // Add text fields
+      data.forEach((key, value) {
+        if (value != null) {
+          request.fields[key] = value.toString();
+        }
+      });
+      
+      // Add file if provided
+      if (imageFile != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'file',
+          imageFile.path,
+          filename: path.basename(imageFile.path),
+        ));
+      }
+      
+      // Send the request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      debugPrint('Response status: ${response.statusCode}');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body);
+        }
+        return {'success': true};
+      } else {
+        _handleHttpError(response);
+      }
+    } catch (e) {
+      debugPrint('Error in file upload: $e');
+      rethrow;
+    }
+  }
+  
+  // Helper method to update with file
+  Future<dynamic> _updateWithFile(String endpoint, Map<String, dynamic> data, File? imageFile) async {
+    try {
+      final url = Uri.parse('$baseUrl$endpoint');
+      debugPrint('PUT with file upload to: $url');
+      
+      final request = http.MultipartRequest('PUT', url);
+      
+      // Add headers
+      final headers = await _getHeaders();
+      headers.forEach((key, value) {
+        request.headers[key] = value;
+      });
+      
+      // Add text fields
+      data.forEach((key, value) {
+        if (value != null) {
+          request.fields[key] = value.toString();
+        }
+      });
+      
+      // Add file if provided
+      if (imageFile != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'file',
+          imageFile.path,
+          filename: path.basename(imageFile.path),
+        ));
+      }
+      
+      // Send the request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      
+      debugPrint('Response status: ${response.statusCode}');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body);
+        }
+        return {'success': true};
+      } else {
+        _handleHttpError(response);
+      }
+    } catch (e) {
+      debugPrint('Error in file update: $e');
+      rethrow;
+    }
+  }
+
+  // Blog Post methods
+  Future<List<Post>> getPosts() async {
+    try {
+      final data = await _get('/posts');
+      return (data as List).map((json) => Post.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error fetching posts: $e');
+      rethrow;
+    }
+  }
+
+  Future<Post> getPostById(String id) async {
+    try {
+      final data = await _get('/posts/$id');
+      return Post.fromJson(data);
+    } catch (e) {
+      debugPrint('Error fetching post by id: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> createPost(Map<String, dynamic> postData, File? imageFile) async {
+    try {
+      if (imageFile == null) {
+        // If no image, use regular post request
+        await _post('/posts/create', postData);
+      } else {
+        // If image provided, use multipart request
+        await _uploadFile('/posts/create', postData, imageFile);
+      }
+    } catch (e) {
+      debugPrint('Error creating post: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updatePost(String postId, Map<String, dynamic> postData, File? imageFile) async {
+    try {
+      if (imageFile == null) {
+        // If no image, use regular put request
+        await _put('/posts/edit/$postId', postData);
+      } else {
+        // If image provided, use multipart request
+        await _updateWithFile('/posts/edit/$postId', postData, imageFile);
+      }
+    } catch (e) {
+      debugPrint('Error updating post: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    try {
+      await _delete('/posts/delete/$postId');
+    } catch (e) {
+      debugPrint('Error deleting post: $e');
+      rethrow;
+    }
+  }
+
+  Future<List<Post>> searchPosts(String query) async {
+    try {
+      final data = await _get('/posts/search/$query');
+      return (data as List).map((json) => Post.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint('Error searching posts: $e');
+      // Return empty list if not found (404)
+      if (e.toString().contains('404')) {
+        return [];
+      }
+      rethrow;
+    }
   }
 } 

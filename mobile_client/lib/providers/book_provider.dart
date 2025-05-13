@@ -52,6 +52,82 @@ class BookProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  
+  Future<bool> createBook(Map<String, dynamic> bookData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.createBook(bookData);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> updateBook(String id, Map<String, dynamic> bookData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.updateBook(id, bookData);
+      
+      // Update the book in the local list
+      final index = _books.indexWhere((book) => book.id == id);
+      if (index != -1) {
+        // If we have the updated book data, update it in the list
+        await fetchBooks(); // Refresh the list for simplicity
+      }
+      
+      // If this was the selected book, refresh it
+      if (_selectedBook != null && _selectedBook!.id == id) {
+        await fetchBookById(id);
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> deleteBook(String id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.deleteBook(id);
+      
+      // Remove the book from the local list
+      _books.removeWhere((book) => book.id == id);
+      
+      // If this was the selected book, clear it
+      if (_selectedBook != null && _selectedBook!.id == id) {
+        _selectedBook = null;
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 
   List<Book> searchBooks(String query) {
     if (query.isEmpty) {

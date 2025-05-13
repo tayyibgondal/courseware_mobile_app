@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/faq_provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/faq.dart';
 import 'add_faq_screen.dart';
+import 'edit_faq_screen.dart';
 
 class FAQsScreen extends StatefulWidget {
   const FAQsScreen({super.key});
@@ -15,6 +18,7 @@ class _FAQsScreenState extends State<FAQsScreen>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   late AnimationController _animationController;
+  Map<String, bool> _deletingFaqs = {};
 
   @override
   void initState() {
@@ -45,9 +49,72 @@ class _FAQsScreenState extends State<FAQsScreen>
       _searchQuery = query;
     });
   }
+  
+  // Show confirmation dialog before deleting
+  Future<void> _confirmDelete(FAQ faq) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete FAQ'),
+        content: const Text('Are you sure you want to delete this FAQ? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _deleteFAQ(faq);
+    }
+  }
+
+  // Delete the FAQ
+  Future<void> _deleteFAQ(FAQ faq) async {
+    setState(() {
+      _deletingFaqs[faq.id] = true;
+    });
+
+    try {
+      final success = await Provider.of<FAQProvider>(context, listen: false)
+          .deleteFAQ(faq.id);
+
+      if (success) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('FAQ deleted successfully')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _deletingFaqs[faq.id] = false;
+        });
+      }
+    }
+  }
+  
+  // Navigate to edit screen
+  void _editFAQ(FAQ faq) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditFAQScreen(faq: faq),
+      ),
+    ).then((_) => _fetchFAQs());
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isAdmin = authProvider.currentUser != null;
+    
     return Stack(
       children: [
         Column(
@@ -154,6 +221,7 @@ class _FAQsScreenState extends State<FAQsScreen>
                     itemBuilder: (context, index) {
                       final faq = faqs[index];
                       final delay = index * 0.1;
+                      final isDeleting = _deletingFaqs[faq.id] ?? false;
 
                       return TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0.0, end: 1.0),
@@ -173,26 +241,63 @@ class _FAQsScreenState extends State<FAQsScreen>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: ExpansionTile(
-                            title: Text(
-                              faq.question,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'General FAQ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            childrenPadding: const EdgeInsets.all(16),
+                          child: Column(
                             children: [
-                              Text(
-                                faq.answer,
-                                style: const TextStyle(fontSize: 14),
+                              ExpansionTile(
+                                title: Text(
+                                  faq.question,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'General FAQ',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                childrenPadding: const EdgeInsets.all(16),
+                                children: [
+                                  Text(
+                                    faq.answer,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  
+                                  // Admin actions
+                                  if (isAdmin) ...[
+                                    const SizedBox(height: 16),
+                                    const Divider(),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        // Edit button
+                                        TextButton.icon(
+                                          onPressed: () => _editFAQ(faq),
+                                          icon: const Icon(Icons.edit, color: Colors.orange),
+                                          label: const Text('Edit', style: TextStyle(color: Colors.orange)),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        // Delete button
+                                        TextButton.icon(
+                                          onPressed: isDeleting ? null : () => _confirmDelete(faq),
+                                          icon: isDeleting
+                                              ? const SizedBox(
+                                                  width: 16,
+                                                  height: 16,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                  ),
+                                                )
+                                              : const Icon(Icons.delete, color: Colors.red),
+                                          label: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
                               ),
                             ],
                           ),

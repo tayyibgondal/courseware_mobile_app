@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/book.dart';
 import '../providers/book_provider.dart';
+import '../providers/auth_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'edit_book_screen.dart';
 
 class BookDetailScreen extends StatefulWidget {
   final String bookId;
@@ -28,6 +30,7 @@ class _BookDetailScreenState extends State<BookDetailScreen>
   late Animation<double> _opacityAnimation;
   bool _isDataLoaded = false;
   bool _isImageLoaded = false;
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -118,9 +121,75 @@ class _BookDetailScreenState extends State<BookDetailScreen>
       }
     }
   }
+  
+  // Show confirmation dialog before deleting
+  Future<void> _confirmDelete(String bookId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Book'),
+        content: const Text('Are you sure you want to delete this book? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _deleteBook(bookId);
+    }
+  }
+
+  // Delete the book
+  Future<void> _deleteBook(String bookId) async {
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final success = await Provider.of<BookProvider>(context, listen: false)
+          .deleteBook(bookId);
+
+      if (success) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Book deleted successfully')),
+        );
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+  
+  // Navigate to edit screen
+  void _editBook(Book book) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditBookScreen(book: book),
+      ),
+    ).then((_) {
+      _loadBookData(); // Refresh data when returning from edit screen
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isAdmin = authProvider.currentUser != null;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: Consumer<BookProvider>(
@@ -307,6 +376,55 @@ class _BookDetailScreenState extends State<BookDetailScreen>
                           ),
                         ),
                       ),
+                      
+                      // Admin actions - only shown if user is logged in
+                      if (isAdmin) ...[
+                        const SizedBox(height: 24),
+                        const Divider(),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Admin Actions',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            // Edit button
+                            ElevatedButton.icon(
+                              onPressed: () => _editBook(book),
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Edit'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                            // Delete button
+                            ElevatedButton.icon(
+                              onPressed: _isDeleting ? null : () => _confirmDelete(book.id),
+                              icon: _isDeleting 
+                                  ? const SizedBox(
+                                      width: 20, 
+                                      height: 20, 
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.delete),
+                              label: const Text('Delete'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

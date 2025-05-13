@@ -47,7 +47,7 @@ class CourseProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createCourse(Map<String, dynamic> courseData) async {
+  Future<bool> createCourse(Map<String, dynamic> courseData) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -56,11 +56,66 @@ class CourseProvider with ChangeNotifier {
       await _apiService.createCourse(courseData);
       // Refresh the courses list after adding a new course
       await fetchCourses();
+      return true;
     } catch (e) {
       _isLoading = false;
       _error = e.toString();
       notifyListeners();
-      throw e; // Re-throw to handle in the UI
+      return false;
+    }
+  }
+  
+  Future<bool> updateCourse(String id, Map<String, dynamic> courseData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.updateCourse(id, courseData);
+      
+      // Refresh the courses list
+      await fetchCourses();
+      
+      // If this was the selected course, refresh it
+      if (_selectedCourse != null && _selectedCourse!.id == id) {
+        await fetchCourseById(id);
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> deleteCourse(String id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.deleteCourse(id);
+      
+      // Remove the course from the local list
+      _courses.removeWhere((course) => course.id == id);
+      
+      // If this was the selected course, clear it
+      if (_selectedCourse != null && _selectedCourse!.id == id) {
+        _selectedCourse = null;
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 

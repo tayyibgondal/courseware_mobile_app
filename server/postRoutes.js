@@ -31,24 +31,34 @@ const router = express.Router();
 
 // ====================== POST ENDPOINTS =============================
 router.post("/create", uploadMiddleware.single("file"), async (req, res) => {
-  // -----------------------------
-  // const { originalname, path } = req.file;
-  // const parts = originalname.split(".");
-  // const ext = parts[parts.length - 1];
-  // const newPath = path + "." + ext;
-  // fs.renameSync(path, newPath);
-  // -----------------------------
+  try {
+    // Make file/image optional
+    let newPath = null;
+    if (req.file) {
+      const { originalname, path } = req.file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+    }
 
-  // If no error in token verification
-  const { title, summary, content, userId } = req.body;
-  const postDoc = await Post.create({
-    title,
-    summary,
-    content,
-    cover: newPath,
-    author: userId,
-  });
-  res.status(200).json({ message: "Post created!" });
+    // Get post data from request
+    const { title, summary, content, userId } = req.body;
+    
+    // Create a new post document
+    const postDoc = await Post.create({
+      title,
+      summary,
+      content,
+      cover: newPath,  // will be null if no file was uploaded
+      author: userId,
+    });
+    
+    res.status(200).json({ message: "Post created!" });
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res.status(500).json({ message: "Failed to create post" });
+  }
 });
 
 router.get("/", async (req, res) => {
@@ -73,7 +83,6 @@ router.get("/:postId", async (req, res) => {
 
 router.put(
   "/edit/:postId",
-
   uploadMiddleware.single("file"),
   async (req, res) => {
     const { postId } = req.params;
@@ -81,15 +90,13 @@ router.put(
     // If user has sent file, update its extension in the saved folder
     let newPath = null;
     try {
-      // -----------------------------
-      // if (req.file) {
-      //   const { originalname, path } = req.file;
-      //   const parts = originalname.split(".");
-      //   const ext = parts[parts.length - 1];
-      //   newPath = path + "." + ext;
-      //   fs.renameSync(path, newPath);
-      // }
-      // -----------------------------
+      if (req.file) {
+        const { originalname, path } = req.file;
+        const parts = originalname.split(".");
+        const ext = parts[parts.length - 1];
+        newPath = path + "." + ext;
+        fs.renameSync(path, newPath);
+      }
 
       const { title, summary, content, userId } = req.body;
       const postDocOld = await Post.findById(postId);

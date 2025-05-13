@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/career_path_provider.dart';
 import '../providers/course_provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/career_path.dart';
 import 'course_detail_screen.dart';
+import 'edit_career_path_screen.dart';
 
 class CareerPathDetailScreen extends StatefulWidget {
   final String careerPathId;
@@ -16,6 +19,7 @@ class CareerPathDetailScreen extends StatefulWidget {
 class _CareerPathDetailScreenState extends State<CareerPathDetailScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -36,9 +40,78 @@ class _CareerPathDetailScreenState extends State<CareerPathDetailScreen>
     _animationController.dispose();
     super.dispose();
   }
+  
+  // Show confirmation dialog before deleting
+  Future<void> _confirmDelete(String id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Career Path'),
+        content: const Text('Are you sure you want to delete this career path? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _deleteCareerPath(id);
+    }
+  }
+
+  // Delete the career path
+  Future<void> _deleteCareerPath(String id) async {
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final success = await Provider.of<CareerPathProvider>(context, listen: false)
+          .deleteCareerPath(id);
+
+      if (success) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Career path deleted successfully')),
+        );
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+  
+  // Navigate to edit screen
+  void _editCareerPath(CareerPath careerPath) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCareerPathScreen(careerPath: careerPath),
+      ),
+    ).then((_) {
+      // Refresh data when returning from edit screen
+      if (mounted) {
+        Provider.of<CareerPathProvider>(context, listen: false).fetchCareerPathById(widget.careerPathId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isAdmin = authProvider.currentUser != null;
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -172,6 +245,55 @@ class _CareerPathDetailScreenState extends State<CareerPathDetailScreen>
                       final courseId = careerPath.courses[index];
                       return _buildCourseItem(courseId);
                     },
+                  ),
+                ],
+                
+                // Admin actions - only shown if user is logged in
+                if (isAdmin) ...[
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Admin Actions',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Edit button
+                      ElevatedButton.icon(
+                        onPressed: () => _editCareerPath(careerPath),
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                      // Delete button
+                      ElevatedButton.icon(
+                        onPressed: _isDeleting ? null : () => _confirmDelete(careerPath.id),
+                        icon: _isDeleting 
+                            ? const SizedBox(
+                                width: 20, 
+                                height: 20, 
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.delete),
+                        label: const Text('Delete'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],

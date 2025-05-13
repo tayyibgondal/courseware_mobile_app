@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/course_provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/course.dart';
+import 'edit_course_screen.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   final String courseId;
@@ -12,6 +15,8 @@ class CourseDetailScreen extends StatefulWidget {
 }
 
 class _CourseDetailScreenState extends State<CourseDetailScreen> {
+  bool _isDeleting = false;
+  
   @override
   void initState() {
     super.initState();
@@ -27,9 +32,76 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     Provider.of<CourseProvider>(context, listen: false).clearSelectedCourse();
     super.dispose();
   }
+  
+  // Show confirmation dialog before deleting
+  Future<void> _confirmDelete(String courseId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Course'),
+        content: const Text('Are you sure you want to delete this course? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _deleteCourse(courseId);
+    }
+  }
+
+  // Delete the course
+  Future<void> _deleteCourse(String courseId) async {
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final success = await Provider.of<CourseProvider>(context, listen: false)
+          .deleteCourse(courseId);
+
+      if (success) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Course deleted successfully')),
+        );
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+  
+  // Navigate to edit screen
+  void _editCourse(Course course) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCourseScreen(course: course),
+      ),
+    ).then((_) {
+      // Refresh data when returning from edit screen
+      Provider.of<CourseProvider>(context, listen: false).fetchCourseById(widget.courseId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isAdmin = authProvider.currentUser != null;
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -138,6 +210,55 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     ),
                   ),
                 ),
+                
+                // Admin actions - only shown if user is logged in
+                if (isAdmin) ...[
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Admin Actions',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Edit button
+                      ElevatedButton.icon(
+                        onPressed: () => _editCourse(course),
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                      // Delete button
+                      ElevatedButton.icon(
+                        onPressed: _isDeleting ? null : () => _confirmDelete(course.id),
+                        icon: _isDeleting 
+                            ? const SizedBox(
+                                width: 20, 
+                                height: 20, 
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.delete),
+                        label: const Text('Delete'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           );

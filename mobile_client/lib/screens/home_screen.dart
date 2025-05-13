@@ -8,6 +8,7 @@ import 'career_paths_screen.dart';
 import 'faqs_screen.dart';
 import 'contact_screen.dart';
 import 'ai_tutor_screen.dart';
+import 'posts_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const CoursesScreen(),
     const BooksScreen(),
     const CareerPathsScreen(),
+    const PostsScreen(),
     const FAQsScreen(),
     const ContactScreen(),
     const AITutorScreen(),
@@ -70,6 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up),
             label: 'Careers',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: 'Blog',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.question_answer),

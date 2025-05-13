@@ -31,6 +31,63 @@ class FAQProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  
+  Future<bool> createFAQ(Map<String, dynamic> faqData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.createFAQ(faqData);
+      await fetchFAQs(); // Refresh the list
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> updateFAQ(String id, Map<String, dynamic> faqData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.updateFAQ(id, faqData);
+      await fetchFAQs(); // Refresh the list
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> deleteFAQ(String id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.deleteFAQ(id);
+      _faqs.removeWhere((faq) => faq.id == id);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
 
   List<FAQ> searchFAQs(String query) {
     if (query.isEmpty) {

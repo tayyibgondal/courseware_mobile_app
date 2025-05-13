@@ -48,8 +48,89 @@ class CareerPathProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('CareerPathProvider: Error fetching career path by id - $e');
       _isLoading = false;
-      _error = e.toString();
+      
+      // Check if the error is a 404 (not found)
+      if (e.toString().contains('404') || e.toString().contains('not found')) {
+        _selectedCareerPath = null;
+        _error = 'Career path not found';
+      } else {
+        _error = e.toString();
+      }
+      
       notifyListeners();
+    }
+  }
+  
+  Future<bool> createCareerPath(Map<String, dynamic> careerPathData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.createCareerPath(careerPathData);
+      await fetchCareerPaths(); // Refresh the list
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> updateCareerPath(String id, Map<String, dynamic> careerPathData) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.updateCareerPath(id, careerPathData);
+      
+      // Refresh the list
+      await fetchCareerPaths();
+      
+      // If this was the selected career path, refresh it
+      if (_selectedCareerPath != null && _selectedCareerPath!.id == id) {
+        await fetchCareerPathById(id);
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  Future<bool> deleteCareerPath(String id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    
+    try {
+      await _apiService.deleteCareerPath(id);
+      
+      // Remove the career path from the local list
+      _careerPaths.removeWhere((path) => path.id == id);
+      
+      // If this was the selected career path, clear it
+      if (_selectedCareerPath != null && _selectedCareerPath!.id == id) {
+        _selectedCareerPath = null;
+      }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
